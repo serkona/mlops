@@ -1,5 +1,11 @@
-# Data
-/data/
+# Data (tracked via DVC)
+data/**
+!data/**/*.dvc
+!data/**/.gitignore
+!data/**/.gitkeep
+
+# Local services data
+mlflow/
 
 # Mac OS-specific storage files
 .DS_Store
