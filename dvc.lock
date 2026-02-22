@@ -1,0 +1,10 @@
+schema: '2.0'
+stages:
+  raw_data:
+    cmd: python -c "print('raw data tracked')"
+    outs:
+    - path: data/raw
+      hash: md5
+      md5: adb08df3fc7a40ff5fb3170fec41de66.dir
+      size: 156435299
+      nfiles: 1

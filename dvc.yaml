@@ -1,0 +1,5 @@
+stages:
+  raw_data:
+    cmd: python -c "print('raw data tracked')"
+    outs:
+    - data/raw

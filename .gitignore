@@ -1,6 +1,5 @@
 # Data (tracked via DVC)
 data/**
-!data/raw/
 !data/**/*.dvc
 !data/**/.gitignore
 !data/**/.gitkeep
