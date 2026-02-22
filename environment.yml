@@ -2,22 +2,38 @@ name: mlops
 channels:
   - conda-forge
 dependencies:
-  - python=3.13.5
+  # Core
+  - python=3.12.9
   - pip
-  - typer
-  - loguru
-  - tqdm
-  - ipython
-  - jupyterlab
-  - matplotlib
-  - notebook
-  - numpy
-  - pandas
-  - scikit-learn
-  - ruff
-  - pytest
+
+  # Jupyter Environment
+  - ipython=8.26.0
+  - jupyterlab=4.2.4
+  - notebook=7.2.1
+
+  # Data Science & ML
+  - numpy=1.26.4
+  - pandas=2.2.2
+  - scikit-learn=1.5.1
+  - matplotlib=3.9.2
+  - seaborn=0.13.2
+
+  # MLOps
+  - dvc=3.53.1
+  - mlflow=2.15.1
+
+  # Tools & Utilities
+  - typer=0.12.3
+  - loguru=0.7.2
+  - tqdm=4.66.4
+
+  # Dev Tools
+  - ruff=0.5.5
+  - pytest=8.3.2
+
   - pip:
-    - python-dotenv
-    - awscli
-    - mkdocs
+    - python-dotenv==1.0.1
+    - awscli==1.33.0
+    - mkdocs==1.6.0
+    - liac-arff==2.5.0
     - -e .
