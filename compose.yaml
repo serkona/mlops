@@ -1,0 +1,8 @@
+services:
+  mlops:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: itmo-mlops
+    container_name: itmo-mlops
+    command: ["sleep", "infinity"]
