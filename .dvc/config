@@ -1,6 +1,5 @@
 [core]
 remote = s3remote
-
 ['remote "s3remote"']
 url = s3://dvc
 endpointurl = http://localhost:9000
