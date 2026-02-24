@@ -1,5 +1,9 @@
 stages:
-  raw_data:
-    cmd: python -c "print('raw data tracked')"
+  prepare_data:
+    cmd: python mlops/dataset.py
+    deps:
+    - data/raw/dataset
+    - mlops/dataset.py
     outs:
-    - data/raw
+    - data/processed/train.csv
+    - data/processed/test.csv

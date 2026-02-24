@@ -8,3 +8,23 @@ stages:
       md5: adb08df3fc7a40ff5fb3170fec41de66.dir
       size: 156435299
       nfiles: 1
+  prepare_data:
+    cmd: python mlops/dataset.py
+    deps:
+    - path: data/raw/dataset
+      hash: md5
+      md5: d7d4434708894b1d786706505defd2fe
+      size: 156435299
+    - path: mlops/dataset.py
+      hash: md5
+      md5: 140ab445c9cf68e7c929432b5c2fdc4e
+      size: 1384
+    outs:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: bee05ad3e3a78f6736b69aa3ed0983d1
+      size: 31171613
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 4e91f876f5b0f5dbf9570b47bb7ed157
+      size: 124692428
