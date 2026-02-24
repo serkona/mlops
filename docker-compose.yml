@@ -13,7 +13,8 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./mlflow:/mlflow
+      - mlflow_data:/tmp/mlflow
+    working_dir: /tmp/mlflow
     command:
       [
         "mlflow",
@@ -23,9 +24,9 @@ services:
         "--port",
         "5000",
         "--backend-store-uri",
-        "sqlite:////mlflow/mlflow.db",
+        "sqlite:////tmp/mlflow/mlflow.db",
         "--default-artifact-root",
-        "/mlflow/artifacts",
+        "/tmp/mlflow/artifacts",
       ]
 
   minio:
@@ -40,3 +41,6 @@ services:
     volumes:
       - ../mlops-dvc-remote:/data
     command: ["server", "/data", "--console-address", ":9001"]
+
+volumes:
+  mlflow_data:
