@@ -1,30 +1,80 @@
-from pathlib import Path
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+import joblib
+import pandas as pd
+from typing import List
+from mlops.config import MODELS_DIR
 
-from loguru import logger
-from tqdm import tqdm
-import typer
+app = FastAPI(title="Credit Card Fraud Detection API")
 
-from mlops.config import MODELS_DIR, PROCESSED_DATA_DIR
+try:
+    model = joblib.load(MODELS_DIR / "model.pkl")
+    scaler = joblib.load(MODELS_DIR / "scaler.pkl")
+except FileNotFoundError:
+    print("Warning: Model or scaler not found at startup.")
+    model = None
+    scaler = None
 
-app = typer.Typer()
+class Transaction(BaseModel):
+    Time: float
+    V1: float
+    V2: float
+    V3: float
+    V4: float
+    V5: float
+    V6: float
+    V7: float
+    V8: float
+    V9: float
+    V10: float
+    V11: float
+    V12: float
+    V13: float
+    V14: float
+    V15: float
+    V16: float
+    V17: float
+    V18: float
+    V19: float
+    V20: float
+    V21: float
+    V22: float
+    V23: float
+    V24: float
+    V25: float
+    V26: float
+    V27: float
+    V28: float
+    Amount: float
 
+class PredictionResponse(BaseModel):
+    prediction: int
+    probability: float
 
-@app.command()
-def main(
-    # ---- REPLACE DEFAULT PATHS AS APPROPRIATE ----
-    features_path: Path = PROCESSED_DATA_DIR / "test_features.csv",
-    model_path: Path = MODELS_DIR / "model.pkl",
-    predictions_path: Path = PROCESSED_DATA_DIR / "test_predictions.csv",
-    # -----------------------------------------
-):
-    # ---- REPLACE THIS WITH YOUR OWN CODE ----
-    logger.info("Performing inference for model...")
-    for i in tqdm(range(10), total=10):
-        if i == 5:
-            logger.info("Something happened for iteration 5.")
-    logger.success("Inference complete.")
-    # -----------------------------------------
+@app.post("/predict", response_model=List[PredictionResponse])
+def predict(transactions: List[Transaction]):
+    if model is None or scaler is None:
+        raise HTTPException(status_code=503, detail="Model not loaded")
 
+    try:
+        data = [t.dict() for t in transactions]
+        df = pd.DataFrame(data)
+        cols = ['Time'] + [f'V{i}' for i in range(1, 29)] + ['Amount']
+        df = df[cols]
+        
+        cols_to_scale = ['Time', 'Amount']
+        df[cols_to_scale] = scaler.transform(df[cols_to_scale])
+        
+        predictions = model.predict(df)
+        probabilities = model.predict_proba(df)[:, 1]
+        results = []
+        for pred, prob in zip(predictions, probabilities):
+            results.append(PredictionResponse(prediction=int(pred), probability=float(prob)))
+            
+        return results
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-if __name__ == "__main__":
-    app()
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}

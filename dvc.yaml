@@ -7,3 +7,23 @@ stages:
     outs:
     - data/processed/train.csv
     - data/processed/test.csv
+
+  featurize:
+    cmd: python mlops/features.py
+    deps:
+    - data/processed/train.csv
+    - data/processed/test.csv
+    - mlops/features.py
+    outs:
+    - data/processed/train_featured.csv
+    - data/processed/test_featured.csv
+    - models/scaler.pkl
+
+  train:
+    cmd: python mlops/modeling/train.py
+    deps:
+    - data/processed/train_featured.csv
+    - data/processed/test_featured.csv
+    - mlops/modeling/train.py
+    outs:
+    - models/model.pkl

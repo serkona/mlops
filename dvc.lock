@@ -28,3 +28,51 @@ stages:
       hash: md5
       md5: 4e91f876f5b0f5dbf9570b47bb7ed157
       size: 124692428
+  featurize:
+    cmd: python mlops/features.py
+    deps:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: bee05ad3e3a78f6736b69aa3ed0983d1
+      size: 31171613
+    - path: data/processed/train.csv
+      hash: md5
+      md5: 4e91f876f5b0f5dbf9570b47bb7ed157
+      size: 124692428
+    - path: mlops/features.py
+      hash: md5
+      md5: 42889f4ec6b2034c6f5bbd4b395da5ce
+      size: 1528
+    outs:
+    - path: data/processed/test_featured.csv
+      hash: md5
+      md5: bee3e233e5b41376b8d40a9f19bb64c1
+      size: 32086228
+    - path: data/processed/train_featured.csv
+      hash: md5
+      md5: 51d7a6fb8c3bfd0f5c1d7c5e412662ff
+      size: 128345335
+    - path: models/scaler.pkl
+      hash: md5
+      md5: 229835b01a2509116e569398287e350d
+      size: 983
+  train:
+    cmd: python mlops/modeling/train.py
+    deps:
+    - path: data/processed/test_featured.csv
+      hash: md5
+      md5: bee3e233e5b41376b8d40a9f19bb64c1
+      size: 32086228
+    - path: data/processed/train_featured.csv
+      hash: md5
+      md5: 51d7a6fb8c3bfd0f5c1d7c5e412662ff
+      size: 128345335
+    - path: mlops/modeling/train.py
+      hash: md5
+      md5: 5d31e60fa05541765ceddc3b6f8cbcc5
+      size: 2757
+    outs:
+    - path: models/model.pkl
+      hash: md5
+      md5: ddaa2adde1b30f984dfc36d2e0717605
+      size: 2645737
