@@ -1,0 +1,89 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  release:
+    name: Сборка и публикация Docker-образа
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Получить код
+        uses: actions/checkout@v4
+
+      - name: Настроить Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Войти в Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Определить версию и имя образа
+        id: meta
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/}"
+          IMAGE="${{ secrets.DOCKERHUB_USERNAME }}/mlops-fraud-api"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "image=${IMAGE}"     >> "$GITHUB_OUTPUT"
+
+      - name: Подготовить Python для создания моделей
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Создать минимальные модели для smoke-теста
+        run: |
+          pip install --quiet scikit-learn joblib numpy
+          python - <<'EOF'
+          import numpy as np
+          from pathlib import Path
+          from sklearn.ensemble import RandomForestClassifier
+          from sklearn.preprocessing import StandardScaler
+          import joblib
+
+          Path("models").mkdir(exist_ok=True)
+          rng = np.random.default_rng(42)
+          X = rng.standard_normal((120, 30))
+          y = np.array([0] * 100 + [1] * 20)
+
+          clf = RandomForestClassifier(n_estimators=5, random_state=42)
+          clf.fit(X, y)
+          joblib.dump(clf, "models/model.pkl")
+
+          scaler = StandardScaler()
+          scaler.fit(X[:, [0, -1]])
+          joblib.dump(scaler, "models/scaler.pkl")
+          EOF
+
+      - name: Собрать и опубликовать образ
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.version }}
+            ${{ steps.meta.outputs.image }}:latest
+
+      - name: Smoke-тест
+        run: |
+          IMAGE="${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.version }}"
+
+          docker run -d \
+            --name smoke-test \
+            -p 8000:8000 \
+            -v "$(pwd)/models:/app/models" \
+            "$IMAGE" \
+            conda run --no-capture-output -n mlops \
+              uvicorn mlops.modeling.predict:app --host 0.0.0.0 --port 8000
+
+          curl --fail --retry 10 --retry-connrefused --retry-delay 2 \
+            http://localhost:8000/health
+
+          docker stop smoke-test
+          docker rm  smoke-test

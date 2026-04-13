@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    name: Линтинг и тесты (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    defaults:
+      run:
+        shell: bash -el {0}
+
+    steps:
+      - name: Получить код
+        uses: actions/checkout@v4
+
+      - name: Кэш conda-пакетов
+        uses: actions/cache@v4
+        with:
+          path: ~/conda_pkgs_dir
+          key: ${{ runner.os }}-conda-py${{ matrix.python-version }}-${{ hashFiles('environment.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-conda-py${{ matrix.python-version }}-
+            ${{ runner.os }}-conda-
+
+      - name: Создать conda-окружение
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          python-version: ${{ matrix.python-version }}
+          environment-file: environment.yml
+          activate-environment: mlops
+          auto-activate-base: false
+          use-only-tar-bz2: true
+
+      - name: Установить инструменты разработки
+        run: pip install pytest-cov httpx flake8 pip-audit
+
+      - name: Линтинг (flake8)
+        run: |
+          flake8 mlops/ \
+            --max-line-length=99 \
+            --extend-ignore=E203,W503,W504 \
+            --count \
+            --show-source \
+            --statistics
+
+      - name: Тесты с покрытием (pytest)
+        run: |
+          pytest tests/ -v \
+            --cov=mlops \
+            --cov-report=xml:coverage-py${{ matrix.python-version }}.xml \
+            --cov-report=term-missing
+
+      - name: Сохранить отчёт покрытия
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report-py${{ matrix.python-version }}
+          path: coverage-py${{ matrix.python-version }}.xml
+          retention-days: 14
+
+      - name: Аудит безопасности зависимостей (pip-audit)
+        run: pip-audit --strict

@@ -15,8 +15,24 @@ classifiers = [
     "Programming Language :: Python :: 3",
     
 ]
-requires-python = "==3.12.9"
+requires-python = ">=3.11"
 
+
+[tool.pytest.ini_options]
+addopts = [
+    "--cov=mlops",
+    "--cov-report=term-missing",
+    "--cov-fail-under=80",
+]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["mlops"]
+omit = [
+    "mlops/dataset.py",
+    "mlops/modeling/train.py",
+    "mlops/plots.py",
+]
 
 [tool.ruff]
 line-length = 99

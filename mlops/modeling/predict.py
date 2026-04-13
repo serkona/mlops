@@ -49,15 +49,18 @@ class Transaction(BaseModel):
 
 class PredictionResponse(BaseModel):
     prediction: int
-    probability: float
+    fraud_probability: float
 
 @app.post("/predict", response_model=List[PredictionResponse])
 def predict(transactions: List[Transaction]):
     if model is None or scaler is None:
         raise HTTPException(status_code=503, detail="Model not loaded")
 
+    if not transactions:
+        return []
+
     try:
-        data = [t.dict() for t in transactions]
+        data = [t.model_dump() for t in transactions]
         df = pd.DataFrame(data)
         cols = ['Time'] + [f'V{i}' for i in range(1, 29)] + ['Amount']
         df = df[cols]
@@ -69,7 +72,7 @@ def predict(transactions: List[Transaction]):
         probabilities = model.predict_proba(df)[:, 1]
         results = []
         for pred, prob in zip(predictions, probabilities):
-            results.append(PredictionResponse(prediction=int(pred), probability=float(prob)))
+            results.append(PredictionResponse(prediction=int(pred), fraud_probability=float(prob)))
             
         return results
     except Exception as e:

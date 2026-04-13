@@ -8,6 +8,32 @@ from mlops.config import PROCESSED_DATA_DIR, MODELS_DIR
 
 app = typer.Typer()
 
+COLS_TO_SCALE = ['Time', 'Amount']
+
+
+def preprocess(
+    train_df: pd.DataFrame,
+    test_df: pd.DataFrame,
+) -> tuple[pd.DataFrame, pd.DataFrame, StandardScaler]:
+    if train_df.empty or test_df.empty:
+        raise ValueError("Input DataFrames cannot be empty")
+
+    for col in COLS_TO_SCALE:
+        if col in train_df.columns and train_df[col].isnull().any():
+            raise ValueError(f"Column '{col}' in train_df contains NaN values")
+        if col in test_df.columns and test_df[col].isnull().any():
+            raise ValueError(f"Column '{col}' in test_df contains NaN values")
+
+    scaler = StandardScaler()
+    train_scaled = train_df.copy()
+    test_scaled = test_df.copy()
+
+    train_scaled[COLS_TO_SCALE] = scaler.fit_transform(train_df[COLS_TO_SCALE])
+    test_scaled[COLS_TO_SCALE] = scaler.transform(test_df[COLS_TO_SCALE])
+
+    return train_scaled, test_scaled, scaler
+
+
 @app.command()
 def main(
     input_path: Path = PROCESSED_DATA_DIR,
@@ -23,26 +49,23 @@ def main(
         raise typer.Exit(code=1)
 
     logger.info("Preprocessing features...")
-    scaler = StandardScaler()
-    cols_to_scale = ['Time', 'Amount']
-    
-    train_df[cols_to_scale] = scaler.fit_transform(train_df[cols_to_scale])
-    test_df[cols_to_scale] = scaler.transform(test_df[cols_to_scale])
+    train_scaled, test_scaled, scaler = preprocess(train_df, test_df)
 
     output_path.mkdir(parents=True, exist_ok=True)
     train_output = output_path / "train_featured.csv"
     test_output = output_path / "test_featured.csv"
-    
-    train_df.to_csv(train_output, index=False)
-    test_df.to_csv(test_output, index=False)
-    
+
+    train_scaled.to_csv(train_output, index=False)
+    test_scaled.to_csv(test_output, index=False)
+
     model_dir.mkdir(parents=True, exist_ok=True)
     scaler_path = model_dir / "scaler.pkl"
     joblib.dump(scaler, scaler_path)
-    
+
     logger.success(f"Processed train data saved to {train_output}")
     logger.success(f"Processed test data saved to {test_output}")
     logger.success(f"Scaler saved to {scaler_path}")
+
 
 if __name__ == "__main__":
     app()
