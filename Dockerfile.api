@@ -1,0 +1,12 @@
+FROM continuumio/miniconda3:latest
+
+WORKDIR /app
+
+COPY pyproject.toml README.md environment.api.yml ./
+COPY mlops ./mlops
+
+RUN conda env create -f environment.api.yml -y \
+    && conda clean -a -y
+
+CMD ["conda", "run", "--no-capture-output", "-n", "mlops-api", "uvicorn", \
+     "mlops.modeling.predict:app", "--host", "0.0.0.0", "--port", "8000"]

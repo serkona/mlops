@@ -45,14 +45,14 @@ services:
   api:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.api
     image: itmo-mlops-api
     container_name: itmo-mlops-api
     ports:
       - "8000:8000"
     volumes:
       - ./models:/app/models
-    command: ["conda", "run", "--no-capture-output", "-n", "mlops", "uvicorn", "mlops.modeling.predict:app", "--host", "0.0.0.0", "--port", "8000"]
+    command: ["conda", "run", "--no-capture-output", "-n", "mlops-api", "uvicorn", "mlops.modeling.predict:app", "--host", "0.0.0.0", "--port", "8000"]
     depends_on:
       - mlops
 

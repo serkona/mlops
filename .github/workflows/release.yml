@@ -64,7 +64,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: Dockerfile
+          file: Dockerfile.api
           push: true
           tags: |
             ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.version }}
@@ -79,7 +79,7 @@ jobs:
             -p 8000:8000 \
             -v "$(pwd)/models:/app/models" \
             "$IMAGE" \
-            conda run --no-capture-output -n mlops \
+            conda run --no-capture-output -n mlops-api \
               uvicorn mlops.modeling.predict:app --host 0.0.0.0 --port 8000
 
           curl --fail --retry 10 --retry-connrefused --retry-delay 2 \

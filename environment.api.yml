@@ -1,0 +1,27 @@
+name: mlops-api
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.11,<3.13
+  - pip
+
+  # API server
+  - fastapi=0.115.0
+  - uvicorn=0.30.6
+  - starlette>=0.40.0
+
+  # ML inference
+  - scikit-learn=1.5.1
+  - pandas=2.2.2
+  - numpy=1.26.4
+  - joblib=1.4.2
+
+  # Utilities
+  - typer=0.12.3
+  - loguru=0.7.2
+  - protobuf>=4.25.8
+  - pillow>=12.2.0
+
+  - pip:
+    - python-dotenv==1.0.1
+    - -e .

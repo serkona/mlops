@@ -28,7 +28,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/conda_pkgs_dir
-          key: ${{ runner.os }}-conda-py${{ matrix.python-version }}-${{ hashFiles('environment.yml') }}
+          key: ${{ runner.os }}-conda-py${{ matrix.python-version }}-${{ hashFiles('environment.api.yml') }}
           restore-keys: |
             ${{ runner.os }}-conda-py${{ matrix.python-version }}-
             ${{ runner.os }}-conda-
@@ -36,8 +36,8 @@ jobs:
       - name: Set up conda environment
         uses: conda-incubator/setup-miniconda@v3
         with:
-          environment-file: environment.yml
-          activate-environment: mlops
+          environment-file: environment.api.yml
+          activate-environment: mlops-api
           auto-activate-base: false
           conda-solver: libmamba
 

@@ -11,10 +11,15 @@ PYTHON_INTERPRETER = python
 #################################################################################
 
 
-## Install Python dependencies
+## Install Python dependencies (dev environment)
 .PHONY: requirements
 requirements:
 	conda env update --name $(PROJECT_NAME) --file environment.yml --prune
+
+## Install API dependencies (production environment)
+.PHONY: requirements-api
+requirements-api:
+	conda env update --name $(PROJECT_NAME)-api --file environment.api.yml --prune
 	
 
 
@@ -60,12 +65,17 @@ sync_data_up:
 
 
 
-## Set up Python interpreter environment
+## Set up Python interpreter environment (dev)
 .PHONY: create_environment
 create_environment:
 	conda env create --name $(PROJECT_NAME) -f environment.yml
-	
 	@echo ">>> conda env created. Activate with:\nconda activate $(PROJECT_NAME)"
+
+## Set up API environment (production)
+.PHONY: create_environment_api
+create_environment_api:
+	conda env create --name $(PROJECT_NAME)-api -f environment.api.yml
+	@echo ">>> conda env created. Activate with:\nconda activate $(PROJECT_NAME)-api"
 	
 
 
