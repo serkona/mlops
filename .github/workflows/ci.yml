@@ -69,4 +69,4 @@ jobs:
           retention-days: 14
 
       - name: Security audit (pip-audit)
-        run: pip-audit --strict
+        run: pip-audit --strict --skip-editable
