@@ -4,11 +4,15 @@ import pytest
 import typer
 
 from mlops.features import COLS_TO_SCALE, main as features_main, preprocess
-from tests.conftest import make_transactions_df
+
+FEATURE_COLS = ['Time'] + [f'V{i}' for i in range(1, 29)] + ['Amount']
 
 
 def _make_df(n: int = 50, random_seed: int = 42, class_val: int | None = None) -> pd.DataFrame:
-    return make_transactions_df(n=n, random_seed=random_seed, class_val=class_val)
+    rng = np.random.default_rng(random_seed)
+    data = {col: rng.standard_normal(n) for col in FEATURE_COLS}
+    data['Class'] = np.full(n, class_val, dtype=int) if class_val is not None else rng.integers(0, 2, n)
+    return pd.DataFrame(data)
 
 
 def _nan_amount_df(n: int = 50) -> pd.DataFrame:
