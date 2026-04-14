@@ -69,6 +69,4 @@ jobs:
           retention-days: 14
 
       - name: Security audit (pip-audit)
-        run: |
-          pip list --format=freeze | grep -v "^mlops==" > /tmp/deps.txt
-          pip-audit -r /tmp/deps.txt --strict
+        run: pip-audit
