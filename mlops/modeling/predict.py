@@ -1,8 +1,10 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from typing import List
+
 import joblib
 import pandas as pd
-from typing import List
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+
 from mlops.config import MODELS_DIR
 
 app = FastAPI(title="Credit Card Fraud Detection API")
@@ -14,6 +16,7 @@ except FileNotFoundError:
     print("Warning: Model or scaler not found at startup.")
     model = None
     scaler = None
+
 
 class Transaction(BaseModel):
     Time: float
@@ -47,9 +50,11 @@ class Transaction(BaseModel):
     V28: float
     Amount: float
 
+
 class PredictionResponse(BaseModel):
     prediction: int
     fraud_probability: float
+
 
 @app.post("/predict", response_model=List[PredictionResponse])
 def predict(transactions: List[Transaction]):
@@ -64,19 +69,20 @@ def predict(transactions: List[Transaction]):
         df = pd.DataFrame(data)
         cols = ['Time'] + [f'V{i}' for i in range(1, 29)] + ['Amount']
         df = df[cols]
-        
+
         cols_to_scale = ['Time', 'Amount']
         df[cols_to_scale] = scaler.transform(df[cols_to_scale])
-        
+
         predictions = model.predict(df)
         probabilities = model.predict_proba(df)[:, 1]
         results = []
         for pred, prob in zip(predictions, probabilities):
             results.append(PredictionResponse(prediction=int(pred), fraud_probability=float(prob)))
-            
+
         return results
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @app.get("/health")
 def health_check():
