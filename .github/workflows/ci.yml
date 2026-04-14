@@ -39,6 +39,7 @@ jobs:
           environment-file: environment.api.yml
           activate-environment: mlops-api
           auto-activate-base: false
+          conda-solver: libmamba
 
       - name: Install dev tools
         run: pip install pytest-cov httpx flake8 pip-audit
