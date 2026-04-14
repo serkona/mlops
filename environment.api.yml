@@ -6,7 +6,7 @@ dependencies:
   - pip
 
   # API server
-  - fastapi=0.115.0
+  - fastapi=0.115.6
   - uvicorn=0.30.6
   - starlette>=0.40.0
 
@@ -20,7 +20,6 @@ dependencies:
   - typer=0.12.3
   - loguru=0.7.2
   - protobuf>=4.25.8
-  - pillow>=12.2.0
 
   - pip:
     - python-dotenv==1.0.1
