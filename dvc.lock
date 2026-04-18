@@ -19,6 +19,10 @@ stages:
       hash: md5
       md5: 4af88f0f8f0a415ac60eb5d337a33aad
       size: 1312
+    params:
+      params.yaml:
+        prepare_data.random_state: 42
+        prepare_data.test_size: 0.2
     outs:
     - path: data/processed/test.csv
       hash: md5
@@ -71,6 +75,10 @@ stages:
       hash: md5
       md5: 78ebc7806035f3dafaa6802402a22e45
       size: 2871
+    params:
+      params.yaml:
+        train.n_estimators: 100
+        train.random_state: 42
     outs:
     - path: models/model.pkl
       hash: md5
