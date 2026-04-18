@@ -1,6 +1,17 @@
+vars:
+  - prepare:
+      test_size: 0.2
+      random_state: 42
+  - train:
+      n_estimators: 100
+      random_state: 42
+
 stages:
   prepare_data:
-    cmd: python mlops/dataset.py
+    cmd: >-
+      python mlops/dataset.py
+      --test-size ${prepare.test_size}
+      --random-state ${prepare.random_state}
     deps:
     - data/raw/dataset
     - mlops/dataset.py
@@ -20,7 +31,10 @@ stages:
     - models/scaler.pkl
 
   train:
-    cmd: python mlops/modeling/train.py
+    cmd: >-
+      python mlops/modeling/train.py
+      --n-estimators ${train.n_estimators}
+      --random-state ${train.random_state}
     deps:
     - data/processed/train_featured.csv
     - data/processed/test_featured.csv

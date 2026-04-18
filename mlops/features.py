@@ -36,9 +36,9 @@ def preprocess(
 
 @app.command()
 def main(
-    input_path: Path = PROCESSED_DATA_DIR,
-    output_path: Path = PROCESSED_DATA_DIR,
-    model_dir: Path = MODELS_DIR,
+    input_path: Path = typer.Option(PROCESSED_DATA_DIR),
+    output_path: Path = typer.Option(PROCESSED_DATA_DIR),
+    model_dir: Path = typer.Option(MODELS_DIR),
 ):
     logger.info("Loading data...")
     try:

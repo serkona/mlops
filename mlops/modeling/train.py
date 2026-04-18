@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from typing import Optional
 
 import joblib
 import mlflow
@@ -17,12 +18,12 @@ app = typer.Typer()
 
 @app.command()
 def main(
-    train_path: Path = PROCESSED_DATA_DIR / "train_featured.csv",
-    test_path: Path = PROCESSED_DATA_DIR / "test_featured.csv",
-    model_dir: Path = MODELS_DIR,
-    n_estimators: int = 100,
-    max_depth: int = None,
-    random_state: int = 42,
+    train_path: Path = typer.Option(PROCESSED_DATA_DIR / "train_featured.csv"),
+    test_path: Path = typer.Option(PROCESSED_DATA_DIR / "test_featured.csv"),
+    model_dir: Path = typer.Option(MODELS_DIR),
+    n_estimators: int = typer.Option(100),
+    max_depth: Optional[int] = typer.Option(None),
+    random_state: int = typer.Option(42),
 ):
     mlflow_tracking_uri = os.getenv("MLFLOW_TRACKING_URI", "http://localhost:5000")
     mlflow.set_tracking_uri(mlflow_tracking_uri)

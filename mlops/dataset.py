@@ -13,10 +13,10 @@ app = typer.Typer()
 
 @app.command()
 def main(
-    input_path: Path = RAW_DATA_DIR / "dataset",
-    output_path: Path = PROCESSED_DATA_DIR,
-    test_size: float = 0.2,
-    random_state: int = 42,
+    input_path: Path = typer.Option(RAW_DATA_DIR / "dataset"),
+    output_path: Path = typer.Option(PROCESSED_DATA_DIR),
+    test_size: float = typer.Option(0.2),
+    random_state: int = typer.Option(42),
 ):
     logger.info("Loading dataset...")
 

@@ -9,7 +9,7 @@ stages:
       size: 156435299
       nfiles: 1
   prepare_data:
-    cmd: python mlops/dataset.py
+    cmd: python mlops/dataset.py --test-size 0.2 --random-state 42
     deps:
     - path: data/raw/dataset
       hash: md5
@@ -17,8 +17,8 @@ stages:
       size: 156435299
     - path: mlops/dataset.py
       hash: md5
-      md5: 140ab445c9cf68e7c929432b5c2fdc4e
-      size: 1384
+      md5: 4af88f0f8f0a415ac60eb5d337a33aad
+      size: 1312
     outs:
     - path: data/processed/test.csv
       hash: md5
@@ -41,8 +41,8 @@ stages:
       size: 124692428
     - path: mlops/features.py
       hash: md5
-      md5: 42889f4ec6b2034c6f5bbd4b395da5ce
-      size: 1528
+      md5: 906d6b83e859efba82e6a63cb4319371
+      size: 2310
     outs:
     - path: data/processed/test_featured.csv
       hash: md5
@@ -57,7 +57,7 @@ stages:
       md5: 229835b01a2509116e569398287e350d
       size: 983
   train:
-    cmd: python mlops/modeling/train.py
+    cmd: python mlops/modeling/train.py --n-estimators 100 --random-state 42
     deps:
     - path: data/processed/test_featured.csv
       hash: md5
@@ -69,8 +69,8 @@ stages:
       size: 128345335
     - path: mlops/modeling/train.py
       hash: md5
-      md5: 5d31e60fa05541765ceddc3b6f8cbcc5
-      size: 2757
+      md5: 78ebc7806035f3dafaa6802402a22e45
+      size: 2871
     outs:
     - path: models/model.pkl
       hash: md5
